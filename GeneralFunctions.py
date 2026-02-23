@@ -24,3 +24,4 @@ def promptUser(typed:type = None, userPrompt: str = None, aboveX:int = False, yn
                 print(f'ValueError: value inputted must be y or n only.')
                 return promptUser(typed, userPrompt, aboveX, ynChoice)
     return userInput
+

@@ -16,12 +16,12 @@ def start_game():
         print("Kings are worth 0, as well as getting verital pairs.")
 
 def deal():
-    suits = ['S', 'C', 'H', 'D']
+    suits = ['♠', '♣', '♡', '♢']
     ranks = ['2','3','4','5','6','7','8','9','10','K','Q','J','A']
     deck = []
     for suit in suits:
         for rank in ranks:
-            deck.append(Card(suit,rank,True))
+            deck.append(Card(suit,rank, random.randint(0,1)))
     
     random.shuffle(deck)
     hand = []
@@ -29,19 +29,44 @@ def deal():
         hand.append(deck.pop())
     TestHand = Hand(hand)
     print(TestHand)
-    print("Should be 3 columns and two rows  ?")
+    print("Should be 3 columns and two rows  cards, random each time")
 
 class Card:
-    def __init__(self, suit, rank, faceDown = True):
+    def __init__(self, suit, rank, faceUp = False):
         self.__suit = suit
         self.__rank = rank
-        self.faceDown = faceDown
+        self.faceUp = faceUp
     
     def __str__(self):
-        if(not self.faceDown):
-            return f"{self.rank} of {self.suit}"
+        if(self.faceUp):
+            return f"{self.__rank} of {self.__suit}. Currently faceup"
         else:
-            return "?"
+            return f"{self.__rank} of {self.__suit}. Currently facedown"
+        
+    def displayCard(self):
+        width = 9
+        # Filler must be one chacter to work with center below
+        filler = "·"
+        if self.faceUp:
+            topRank = "|" + str(self.__rank).ljust(width) + "|"
+            midLine = "|" + str(self.__suit).center(width) + "|"
+            botRank = "|" + str(self.__rank).rjust(width) + "|"
+            spacer = "|" + " "*width + "|"
+
+        else:
+            spacer = "|" + filler*width + "|"
+            topRank = spacer
+            midLine = "|" + "GOLF".center(width, filler) + "|"
+            botRank = spacer
+            
+
+
+        topLine = " " + "_"*width + " "
+        botLine = " " + "‾"*width + " "
+
+        stringDisplay =  [topLine,topRank,spacer,midLine,spacer,botRank,botLine]
+        return stringDisplay
+
 
 class Hand:
     def __init__(self, cards: list):
@@ -53,11 +78,16 @@ class Hand:
     def peek(self, position):
         pass
     def __str__(self):
-        rowStr="Current Hand:"
+        rowStr="Current Hand:\n"
         for row in self.grid:
-            rowStr += "\n|"
+            cardsDisplay = [""for i in range(7)]
             for card in row:
-                rowStr += str(card) + " | "
+                cardByLine=card.displayCard()
+                for i in range(len(cardByLine)):
+                    cardsDisplay[i] +=cardByLine[i] + "   "
+            for line in cardsDisplay:
+                print(line)
+            
         return rowStr
 
 
