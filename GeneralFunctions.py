@@ -1,4 +1,4 @@
-def promptUser(typed:type = None, userPrompt: str = None, aboveX:int = None,underY:int = None, ynChoice: bool =False):
+def promptUser(typed:type = None, userPrompt: str = None, aboveX:int = None,underY:int = None, ynChoice: bool =False, inList=[]):
     """Returns value from prompted user, optional arg to enforce type return of prompt, and to give specific prompt"""
     kwargs = {
         'typed':typed, 
@@ -38,5 +38,9 @@ def promptUser(typed:type = None, userPrompt: str = None, aboveX:int = None,unde
             if  userInput.lower() not in ['y','n']:
                 print(f'ValueError: value inputted must be y or n only.')
                 return promptUser(**kwargs)
+    if inList:
+        if userInput.lower() not in inList:
+                print(f'ValueError: value inputted must one of {inList}.')
+                return promptUser(**kwargs)   
     return userInput
 
