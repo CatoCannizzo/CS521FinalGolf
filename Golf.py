@@ -15,7 +15,7 @@ def start_game():
         print("All cards are worth their number, with Jacks & Queens worth 10")
         print("Kings are worth 0, as well as getting verital pairs.")
     playerPrompt = "How many players will there be today?"
-    return promptUser(int,playerPrompt,0)
+    return promptUser(int,playerPrompt,0,5)
 
 def setUpGame(numPlayers):
     deck=Deck()
@@ -42,4 +42,4 @@ if __name__ == "__main__":
     game = Game(**gameState)
     
     # while not game.lastRound:
-    Game.playTurn(game)
+    game.playTurn()
