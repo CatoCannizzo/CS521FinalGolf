@@ -1,5 +1,5 @@
 import random
-
+from GeneralFunctions import promptUser
 class Deck:
     def __init__(self, order=None):
         suits = ['♠', '♣', '♡', '♢']
@@ -74,13 +74,12 @@ class Game:
         self.lastRound = False
         self.currentPlayer = players[0]
         self.rowLength = 9*3+5*3
+        self.activeCard = None
 
-    def getCardbyLine(self, card):
+    def getCardbyLine(self, card:Card):
         width = 9
         # Filler must be one chacter to work with center below
         filler = "·"
-        if not isinstance(card,Card):
-           card:Card = card[-1] 
 
         if card.faceUp:
             topRank = "|" + str(card.rank).ljust(width) + "|"
@@ -121,17 +120,47 @@ class Game:
         for line in cardsDisplay:
             print(line.center(self.rowLength))
 
-    def displayGameState(self):
-        p = self.currentPlayer
-        deckNames = "Deck:"+"-"*7+"Discard:"
-        print(deckNames.center(self.rowLength,'-'))
-        self.displayLine([self.deck, self.discard])
+    def displayGameState(self, player:Player=None, isActive=True):
+        if player:
+            p = player
+        else:
+            p = self.currentPlayer
+            deckNames = "Deck:"+"-"*7+"Discard:"
+            print(deckNames.center(self.rowLength,'-'))
+        self.displayLine([self.deck[-1], self.discard[-1]])
         print(f"{p.name}'s hand".center(self.rowLength,'-'))
         for index, row in enumerate(p.grid):
             self.displayLine(row, index+1)
+        self.action(isActive)
+
+    def action(self, isActive):
+        actionList=['v','q','w']
+        turnPrompt="What would you like to do? \n"\
+        "(V) View another players hand\n"\
+        "(Q) Draw from the deck\n"\
+        "(W) Draw from the discard"
+        if not isActive:
+            turnPrompt+="\n(R) Return to your hand view"
+            actionList.append("r")
+
+        userInput = promptUser(str,turnPrompt,0,2,False,actionList).lower()
+    
+        if userInput == 'v':
+            otherPlayers = [player.name for player in self.players].remove(self.currentPlayer.name)
+            if otherPlayers:
+                playersList = enumerate(otherPlayers)
+                playersStr = ", ".join([f"{k+1}: {v}" for k, v in playersList])
+                choosePlayer="Please choose select the number of the following players to see the board state of:\n"\
+                f"{playersStr}"
+                pNum = promptUser(int,choosePlayer,0,5,inList = [k+1 for k in playersList])
+                self.displayGameState(self.players[pNum-1], False)
+            else:
+                print("You can't view other players hands when playing by youself!")
+                self.action(isActive)
 
     def playTurn(self):
         self.displayGameState()
+
         
 
             
