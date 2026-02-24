@@ -46,5 +46,5 @@ if __name__ == "__main__":
     
     while game.currentPlayer != game.ended:
         game.playTurn()
-    
 
+    game.score()

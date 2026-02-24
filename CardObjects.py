@@ -45,7 +45,17 @@ class Card:
     
     def flip(self):
         self.faceUp = not self.faceUp
-        
+
+    def getValue(self):
+        '''Returns score value of card not considering vertical pairs'''
+        if self.rank == 'K':
+            return 0
+        if self.rank == 'Q' or 'J':
+            return 10
+        if self.rank == 'A':
+            return 1
+        else: return int(self.rank)    
+
 class Player:
     def __init__(self, cards: list, name="player"):
         self.name = name
@@ -54,26 +64,40 @@ class Player:
         self.grid = [cards[0:3],cards[3:6]]
 
     def checkFinished(self):
-        flippedCounter = 0
-        for row in self.grid:
-            for card in row:
-                if card.faceUp:
-                    flippedCounter += 1
-        print(f"Current count: {flippedCounter}")
-        if flippedCounter == 6:
+        hand = self.getHand()
+        print("checking finished")
+        if all(card.faceUp for card in hand):
             return True
         return False
 
     def getHand(self):
-        return self.grid
+        cards = []
+        for row in self.grid:
+            for card in row:
+                cards.append(card)
+        return cards
 
     def __str__(self):
-        rowStr=f"{self.name}'s hand:"
-        for row in self.grid:
-            rowStr += "\n|"
-            for card in row:
-                rowStr += str(card) + " | "
-        return rowStr
+        handStr=f"{self.name}'s hand:"
+        hand = self.getHand()
+        for i in range(len(hand)):
+            handStr += str(hand[i]) + "|"
+            if i%3 == 0:
+                handStr += "\n|"
+        return handStr
+    
+    def calcScore(self):
+        total = 0
+        hand = self.grid
+        for col in range(3):
+            cardTop = hand[0][col]
+            cardBot = hand[1][col]
+        if cardTop.rank == cardBot.rank:
+            pass
+        else:
+            total += cardTop.getValue()
+            total += cardBot.getValue()
+        return total
 
 
 class Game:
@@ -136,7 +160,7 @@ class Game:
     def displayGameState(self, player:Player=None, playerNotActive=False):
         # clears terminal according to:
         # https://stackoverflow.com/questions/517970/how-can-i-clear-the-interpreter-console
-        print("\033[H\033[J", end="")
+        # print("\033[H\033[J", end="")
         
         print(self.deck)
         if player:
@@ -157,14 +181,13 @@ class Game:
             print(f"{p.name}'s hand".center(self.rowLength,'-'))
         for index, row in enumerate(p.grid):
             self.displayByLine(row, index+1)
-
-    
+   
     def swapCard(self, target:int=None):
         if target:
             row = (target-1)//3
             col = (target-1)%3
             player = self.players[self.currentPlayer]
-            playerCards = player.getHand()
+            playerCards = player.grid
             targetCard = playerCards[row][col]
             playerCards[row][col] = self.activeCard
             if not targetCard.faceUp:
@@ -245,14 +268,41 @@ class Game:
                     self.draw(drawFromDeck=True)
                 if userInput == 'w':
                     self.draw(drawFromDeck=False)
-        
+
+        print("self.lastround check")
+        if  self.lastRound:
+            hand = self.players[self.currentPlayer].getHand()
+            for card in hand:
+                if not card.faceUp:
+                    card.flip()
+
+        else:
+            print("In Else")
             if self.players[self.currentPlayer].checkFinished():
                 self.lastRound = True
                 self.ended = self.currentPlayer
 
         self.displayGameState()
         print(f"\n{self.players[self.currentPlayer].name}, your turn is complete.")
+        if self.lastRound and self.currentPlayer!= self.ended:
+            print("\nAll cards flipped for game end scoring!")
         input("Press enter to pass the turn to the next player...")  
+            
         self.currentPlayer = (self.currentPlayer+1) % len(self.players)
 
-    def score(self)
+    def score(self):
+        print("\033[H\033[J", end="")
+        print("Final Scores:".center(self.rowLength,'='))
+            
+        scores = [{"player":player.name, "score":player.calcScore()} for player in self.players]  
+        scores.sort(key=lambda x:x["score"])
+        for i in range(len(scores)):
+
+            if i != 0 and scores[i]['score'] == scores[i-1]['score']:
+                continue
+            elif i != len(scores)-1 and scores[i]['score'] == scores[i+1]['score']:
+                tieScore = scores[i]['score']
+                tiePlayers = [j for j in scores if j['score'] == tieScore]
+                for player in tiePlayers:
+                    print(f"{i+1}) TIE! {player['player']} got {tieScore} points!")
+            else: print(f"{i+1} {scores[i]['player']} got {scores[i]['score']} points!")
