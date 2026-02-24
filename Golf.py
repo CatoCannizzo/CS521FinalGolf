@@ -1,5 +1,5 @@
 from GeneralFunctions import promptUser
-from CardObjects import *
+from GameObjects import *
 
 def start_game():
     print("Welcome to the card game Golf!")
