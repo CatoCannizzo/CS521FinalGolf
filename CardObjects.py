@@ -5,7 +5,7 @@ class Deck:
         suits = ['♠', '♣', '♡', '♢']
         ranks = ['2','3','4','5','6','7','8','9','10','K','Q','J','A']
         if order:
-            self.deck = order
+            self.deck = [order]
         else:
             self.deck = []
             for suit in suits:
@@ -16,15 +16,17 @@ class Deck:
         return f"A deck of {len(self.deck)} playing cards"
     def __repr__(self):
         return str([str(card) for card in self.deck])
-    def deal(self, faceup:bool = False):
+    def deal(self, flip:bool = False):
         card: Card = self.deck.pop()
-        if faceup:
+        if flip:
             card.turn()
         return card
+    def add(self, card):
+        self.deck.append(card)
 
-        return    
     def __getitem__(self, index):
         return self.deck[index]
+    
     def __len__(self):
         return len(self.deck)
 
@@ -70,7 +72,7 @@ class Game:
     def __init__(self, players:list[Player], deck:Deck, discard: list[Card]=None):
         self.players = players
         self.deck = deck
-        self.discard = discard if discard else [self.deck.deal(True)]
+        self.discard = discard if discard else Deck(self.deck.deal(True))
         self.lastRound = False
         self.currentPlayer = players[0]
         self.rowLength = 9*3+5*3
@@ -99,7 +101,7 @@ class Game:
         stringDisplay =  [topLine,topRank,spacer,midLine,spacer,botRank,botLine]
         return stringDisplay
 
-    def displayLine(self, cards:list, playerHand:int = 0):
+    def displayByLine(self, cards:list, playerHand:int = 0):
         cardsDisplay = [""for i in range(7)]
         if playerHand:
             for i in range(0,len(cards)):
@@ -120,31 +122,71 @@ class Game:
         for line in cardsDisplay:
             print(line.center(self.rowLength))
 
-    def displayGameState(self, player:Player=None, isActive=True):
+    def displayGameState(self, player:Player=None):
+        print(self.deck)
+
         if player:
             p = player
         else:
             p = self.currentPlayer
+
+        if self.activeCard:
+            print('You drew:'.center(self.rowLength,'-'))
+            self.displayByLine([self.activeCard])
+        else:
             deckNames = "Deck:"+"-"*7+"Discard:"
             print(deckNames.center(self.rowLength,'-'))
-        self.displayLine([self.deck[-1], self.discard[-1]])
+            self.displayByLine([self.deck[-1], self.discard[-1]])
         print(f"{p.name}'s hand".center(self.rowLength,'-'))
         for index, row in enumerate(p.grid):
-            self.displayLine(row, index+1)
-        self.action(isActive)
+            self.displayByLine(row, index+1)
+        if self.activeCard:
+            self.placeCard()
+        else:
+            self.action(bool(player))
+    
+    def swapCard(self, target:int=None):
+        if target:
+            row = (target-1)//3
+            col = (target)-1%3
+            targetCard = self.currentPlayer.grid[row][col]
+            self.currentPlayer.grid[row][col] = self.activeCard
+            self.activeCard = targetCard
+        self.discard.add(self.activeCard)
+        self.activeCard = None
+        self.displayGameState()
+    
+    def placeCard(self):
+        actionList=['1','2','3', '4', '5', '6', 'q']
+        turnPrompt="What would you like to do? \n"\
+        "(1-6) Replace cards 1-6 from your hand with the card you drew\n"\
+        "(q) Discard the card you drew into the discard pile"
 
-    def action(self, isActive):
+        userInput: str = promptUser(str,turnPrompt,0,2,False,actionList).lower()
+        if userInput.isnumeric():
+            self.swapCard(userInput)
+        else:
+             self.swapCard()
+
+    def draw(self,drawFromDeck:bool = True):
+        if drawFromDeck:
+            self.activeCard = self.deck.deal(True)
+        else:
+            self.activeCard = self.discard.deal()
+        self.displayGameState()
+
+    def action(self, isnotActive = False):
         actionList=['v','q','w']
         turnPrompt="What would you like to do? \n"\
         "(V) View another players hand\n"\
         "(Q) Draw from the deck\n"\
         "(W) Draw from the discard"
-        if not isActive:
+        if isnotActive:
             turnPrompt+="\n(R) Return to your hand view"
             actionList.append("r")
 
         userInput = promptUser(str,turnPrompt,0,2,False,actionList).lower()
-    
+
         if userInput == 'v':
             otherPlayers = [player.name for player in self.players].remove(self.currentPlayer.name)
             if otherPlayers:
@@ -156,7 +198,14 @@ class Game:
                 self.displayGameState(self.players[pNum-1], False)
             else:
                 print("You can't view other players hands when playing by youself!")
-                self.action(isActive)
+                self.action()
+        if userInput == 'r':
+            self.displayGameState()
+        if userInput == 'q':
+            self.draw(drawFromDeck=True)
+        if userInput == 'w':
+            self.draw(drawFromDeck=False)
+    
 
     def playTurn(self):
         self.displayGameState()
