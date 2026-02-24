@@ -1,4 +1,5 @@
 import random
+import json
 from GeneralFunctions import promptUser
 
 class Deck:
@@ -54,7 +55,9 @@ class Card:
             return 10
         if self.rank == 'A':
             return 1
-        else: return int(self.rank)    
+        else: return int(self.rank) 
+    def repr(self):
+        return{"suit": self.suit, "rank":self.rank, "faceUp":self.faceUp}
 
 class Player:
     def __init__(self, cards: list, name="player"):
@@ -98,20 +101,26 @@ class Player:
                 total += cardTop.getValue()
                 total += cardBot.getValue()
         return total
+    
+    def __repr__(self):
+        return {
+            "name": self.name,
+            "grid": self.grid
+        }
+    
 
 
 class Game:
-    def __init__(self, players:list[Player], deck:Deck, discard: list[Card]=None):
+    def __init__(self, players:list[Player], deck:Deck, discard: list[Card]=None,lastround=False,currentPlayer=0,rowLength=(11*3+4*3),message=None,ended=None):
         self.players = players
         self.deck = deck
         self.discard = discard if discard else Deck(self.deck.deal(True))
-        self.lastRound = False
-        self.currentPlayer = 0
-        self.rowLength = 11*3+4*3
-
+        self.lastRound = lastRound
+        self.currentPlayer = currentPlayer
+        self.rowLength = rowLength
         self.activeCard = None
-        self.message = None
-        self.ended = None
+        self.message = self.message
+        self.ended = ended
 
     def getCardbyLine(self, card:Card):
         width = 9
@@ -247,7 +256,6 @@ class Game:
 
         return userInput
     
-
     def playTurn(self):
         currentTurn = True
         while currentTurn:
@@ -306,3 +314,19 @@ class Game:
                 for player in tiePlayers:
                     print(f"{i+1}) TIE! {player['player']} got {tieScore} points!")
             else: print(f"{i+1} {scores[i]['player']} got {scores[i]['score']} points!")
+    
+    def save(self):
+        data = {
+            "currentPlayer":self.currentPlayer,
+            "lastRound": self.lastRound,
+            "ended":self.ended,
+            "message":self.message,
+            "rowLength":self.rowLength,
+            "players": [p.__repr__ for p in self.players],
+            "discard": [c.__repr__ for c in self.discard],
+            "deck": [c.__repr__ for c in self.deck]
+        }
+        gameName = "Please input a name for this game."
+        gameName=promptUser(str,gameName,0,14)
+        with open(gameName,'w') as f:
+            json.dump(data, f, indent=4)
