@@ -32,7 +32,11 @@ def promptUser(typed:type = None, userPrompt: str = None, aboveX:int = None,unde
             if ynChoice:
                 if  userInput.lower() not in ['y','n']:
                     print(f'ValueError: value inputted must be y or n only.')
-                    continue
+                    if userInput.lower() =='y':
+                         return True
+                    if userInput.lower() == 'n':
+                         return False
+                    
         if inList:
             if userInput.lower() not in inList:
                     print(f'ValueError: value inputted must one of {inList}.')
