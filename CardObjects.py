@@ -83,9 +83,9 @@ class Game:
         self.discard = discard if discard else Deck(self.deck.deal(True))
         self.lastRound = False
         self.currentPlayer = 0
-        self.rowLength = 9*3+5*3
+        self.rowLength = 11*3+4*3
+
         self.activeCard = None
-        self.playerNotActive = False
         self.message = None
         self.ended = None
 
@@ -133,7 +133,7 @@ class Game:
         for line in cardsDisplay:
             print(line.center(self.rowLength))
 
-    def displayGameState(self, player:Player=None):
+    def displayGameState(self, player:Player=None, playerNotActive=False):
         # clears terminal according to:
         # https://stackoverflow.com/questions/517970/how-can-i-clear-the-interpreter-console
         print("\033[H\033[J", end="")
@@ -144,8 +144,6 @@ class Game:
         else:
             p = self.players[self.currentPlayer]
         
-        p.checkFinished()
-
         if self.activeCard:
             print('You drew:'.center(self.rowLength,'-'))
             self.displayByLine([self.activeCard])
@@ -153,7 +151,7 @@ class Game:
             deckNames = "Deck:"+"-"*7+"Discard:"
             print(deckNames.center(self.rowLength,'-'))
             self.displayByLine([self.deck[-1], self.discard[-1]])
-        if self.playerNotActive:
+        if playerNotActive:
             print(f"{p.name}'s hand (NOT ACTIVE PLAYER'S HAND)".center(self.rowLength,'-'))
         else:
             print(f"{p.name}'s hand".center(self.rowLength,'-'))
@@ -198,28 +196,27 @@ class Game:
             self.activeCard = self.discard.deal()
 
     def changeView(self):
-        current = self.players[self.currentPlayer].name
-        others = [player.name for player in self.players if player.name != current]
+        current = self.players[self.currentPlayer]
+        others = [player for player in self.players if player != current]
         if others:
             playersList = enumerate(others)
-            playersStr = ", ".join([f"{k+1}: {v}" for k, v in playersList])
+            playersStr = ", ".join([f"{k+1}: {v.name}" for k, v in playersList])
             choosePlayer="Please choose select the number of the following players to see the board state of:\n"\
             f"{playersStr}"
             pNum = promptUser(int,choosePlayer,0,5,inList = [k+1 for k in playersList])
-            self.playerNotActive = True
-            self.displayGameState(self.players[pNum-1])
+            self.displayGameState(others[pNum-1], True)
         else:
             self.message= "You can't view other players hands when playing by youself!"
 
     def getAction(self):
+        if self.lastRound:
+            print(f"{self.players[self.ended].name} ended the game!\n"\
+            "All other players: This is your last round.")
         actionList=['v','q','w']
         turnPrompt="What would you like to do? \n"\
         "(V) View another players hand\n"\
         "(Q) Draw from the deck\n"\
         "(W) Draw from the discard"
-        if self.playerNotActive:
-            turnPrompt+="\n(R) Return to your hand view"
-            actionList.append("r")
         if self.message:
             print(self.message)
             self.message = None
@@ -241,10 +238,9 @@ class Game:
                 userInput = self.getAction()
                 if userInput == 'v':
                     self.changeView()
+                    input("\nViewing other player. Press Enter to return to your hand...")
                     continue
-                self.playerNotActive = False
-                if userInput == 'r':
-                    self.displayGameState()
+
                 if userInput == 'q':
                     self.draw(drawFromDeck=True)
                 if userInput == 'w':
@@ -252,7 +248,11 @@ class Game:
         
             if self.players[self.currentPlayer].checkFinished():
                 self.lastRound = True
-                self.message = f"{self.players[self.currentPlayer].name} ended the game! All other players will have one more round."
                 self.ended = self.currentPlayer
-        
+
+        self.displayGameState()
+        print(f"\n{self.players[self.currentPlayer].name}, your turn is complete.")
+        input("Press enter to pass the turn to the next player...")  
         self.currentPlayer = (self.currentPlayer+1) % len(self.players)
+
+    def score(self)
