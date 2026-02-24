@@ -25,7 +25,7 @@ def setUpGame(numPlayers):
     for player in range(0,numPlayers):
         namePrompt = f"What is the name of player {player+1}? (Name must be between 1-14 chars)"
         # name = promptUser(str,namePrompt,1,14)
-        name = "asd"
+        name = "Player " + str(player)
         hand = []
         for x in range(6):
             hand.append(deck.deal())
@@ -37,9 +37,14 @@ def setUpGame(numPlayers):
 
 if __name__ == "__main__":
     # gameState = setUpGame(start_game())
-    gameState = setUpGame(1)
+    gameState = setUpGame(2)
 
     game = Game(**gameState)
     
-    # while not game.lastRound:
-    game.playTurn()
+    while not game.lastRound:
+        game.playTurn()
+    
+    while game.currentPlayer != game.ended:
+        game.playTurn()
+    
+

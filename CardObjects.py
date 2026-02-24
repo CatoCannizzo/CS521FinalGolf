@@ -1,6 +1,5 @@
 import random
 from GeneralFunctions import promptUser
-from os import system
 
 class Deck:
     def __init__(self, order=None):
@@ -54,10 +53,17 @@ class Player:
             raise ValueError(f"Invalid hand size, expected 6 cards but recieved {len(cards)}")
         self.grid = [cards[0:3],cards[3:6]]
 
-    def swap(self, position):
-        pass
-    def peek(self, position):
-        pass
+    def checkFinished(self):
+        flippedCounter = 0
+        for row in self.grid:
+            for card in row:
+                if card.faceUp:
+                    flippedCounter += 1
+        print(f"Current count: {flippedCounter}")
+        if flippedCounter == 6:
+            return True
+        return False
+
     def getHand(self):
         return self.grid
 
@@ -76,11 +82,12 @@ class Game:
         self.deck = deck
         self.discard = discard if discard else Deck(self.deck.deal(True))
         self.lastRound = False
-        self.currentPlayer = players[0]
+        self.currentPlayer = 0
         self.rowLength = 9*3+5*3
         self.activeCard = None
         self.playerNotActive = False
         self.message = None
+        self.ended = None
 
     def getCardbyLine(self, card:Card):
         width = 9
@@ -127,12 +134,17 @@ class Game:
             print(line.center(self.rowLength))
 
     def displayGameState(self, player:Player=None):
-        system("clear||cls")        
+        # clears terminal according to:
+        # https://stackoverflow.com/questions/517970/how-can-i-clear-the-interpreter-console
+        print("\033[H\033[J", end="")
+        
         print(self.deck)
         if player:
             p = player
         else:
-            p = self.currentPlayer
+            p = self.players[self.currentPlayer]
+        
+        p.checkFinished()
 
         if self.activeCard:
             print('You drew:'.center(self.rowLength,'-'))
@@ -151,13 +163,16 @@ class Game:
     
     def swapCard(self, target:int=None):
         if target:
-            col = (target-1)//3
-            row = (target-1)%3
-            targetCard:Card = self.currentPlayer.grid[col][row]
-            self.currentPlayer.grid[col][row] = self.activeCard
+            row = (target-1)//3
+            col = (target-1)%3
+            player = self.players[self.currentPlayer]
+            playerCards = player.getHand()
+            targetCard = playerCards[row][col]
+            playerCards[row][col] = self.activeCard
             if not targetCard.faceUp:
                 targetCard.flip()
             self.activeCard = targetCard
+
 
         self.discard.add(self.activeCard)
         self.activeCard = None
@@ -183,9 +198,10 @@ class Game:
             self.activeCard = self.discard.deal()
 
     def changeView(self):
-        otherPlayers = [player.name for player in self.players].remove(self.currentPlayer.name)
-        if otherPlayers:
-            playersList = enumerate(otherPlayers)
+        current = self.players[self.currentPlayer].name
+        others = [player.name for player in self.players if player.name != current]
+        if others:
+            playersList = enumerate(others)
             playersStr = ", ".join([f"{k+1}: {v}" for k, v in playersList])
             choosePlayer="Please choose select the number of the following players to see the board state of:\n"\
             f"{playersStr}"
@@ -219,23 +235,24 @@ class Game:
            
             if self.activeCard:
                 self.placeCard()
+                currentTurn = False
             
             else:
                 userInput = self.getAction()
-
                 if userInput == 'v':
                     self.changeView()
-                self.playerNotActive
+                    continue
+                self.playerNotActive = False
                 if userInput == 'r':
                     self.displayGameState()
                 if userInput == 'q':
                     self.draw(drawFromDeck=True)
                 if userInput == 'w':
                     self.draw(drawFromDeck=False)
-
         
-
-            
-
-
-  
+            if self.players[self.currentPlayer].checkFinished():
+                self.lastRound = True
+                self.message = f"{self.players[self.currentPlayer].name} ended the game! All other players will have one more round."
+                self.ended = self.currentPlayer
+        
+        self.currentPlayer = (self.currentPlayer+1) % len(self.players)
