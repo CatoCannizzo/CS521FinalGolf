@@ -1,5 +1,7 @@
 import random
 from GeneralFunctions import promptUser
+from os import system
+
 class Deck:
     def __init__(self, order=None):
         suits = ['♠', '♣', '♡', '♢']
@@ -19,7 +21,7 @@ class Deck:
     def deal(self, flip:bool = False):
         card: Card = self.deck.pop()
         if flip:
-            card.turn()
+            card.flip()
         return card
     def add(self, card):
         self.deck.append(card)
@@ -42,7 +44,7 @@ class Card:
         else:
             return f"{self.rank} of {self.suit}"
     
-    def turn(self):
+    def flip(self):
         self.faceUp = not self.faceUp
         
 class Player:
@@ -77,6 +79,8 @@ class Game:
         self.currentPlayer = players[0]
         self.rowLength = 9*3+5*3
         self.activeCard = None
+        self.playerNotActive = False
+        self.message = None
 
     def getCardbyLine(self, card:Card):
         width = 9
@@ -123,8 +127,8 @@ class Game:
             print(line.center(self.rowLength))
 
     def displayGameState(self, player:Player=None):
+        system("clear||cls")        
         print(self.deck)
-
         if player:
             p = player
         else:
@@ -137,24 +141,26 @@ class Game:
             deckNames = "Deck:"+"-"*7+"Discard:"
             print(deckNames.center(self.rowLength,'-'))
             self.displayByLine([self.deck[-1], self.discard[-1]])
-        print(f"{p.name}'s hand".center(self.rowLength,'-'))
+        if self.playerNotActive:
+            print(f"{p.name}'s hand (NOT ACTIVE PLAYER'S HAND)".center(self.rowLength,'-'))
+        else:
+            print(f"{p.name}'s hand".center(self.rowLength,'-'))
         for index, row in enumerate(p.grid):
             self.displayByLine(row, index+1)
-        if self.activeCard:
-            self.placeCard()
-        else:
-            self.action(bool(player))
+
     
     def swapCard(self, target:int=None):
         if target:
-            row = (target-1)//3
-            col = (target)-1%3
-            targetCard = self.currentPlayer.grid[row][col]
-            self.currentPlayer.grid[row][col] = self.activeCard
+            col = (target-1)//3
+            row = (target-1)%3
+            targetCard:Card = self.currentPlayer.grid[col][row]
+            self.currentPlayer.grid[col][row] = self.activeCard
+            if not targetCard.faceUp:
+                targetCard.flip()
             self.activeCard = targetCard
+
         self.discard.add(self.activeCard)
         self.activeCard = None
-        self.displayGameState()
     
     def placeCard(self):
         actionList=['1','2','3', '4', '5', '6', 'q']
@@ -164,51 +170,68 @@ class Game:
 
         userInput: str = promptUser(str,turnPrompt,0,2,False,actionList).lower()
         if userInput.isnumeric():
-            self.swapCard(userInput)
-        else:
+            self.swapCard(int(userInput))
+        elif userInput == 'q':
              self.swapCard()
+        else:
+            raise ValueError(f"User input here should have only exepted 1-6 and q. You managed to break the game!")
 
     def draw(self,drawFromDeck:bool = True):
         if drawFromDeck:
             self.activeCard = self.deck.deal(True)
         else:
             self.activeCard = self.discard.deal()
-        self.displayGameState()
 
-    def action(self, isnotActive = False):
+    def changeView(self):
+        otherPlayers = [player.name for player in self.players].remove(self.currentPlayer.name)
+        if otherPlayers:
+            playersList = enumerate(otherPlayers)
+            playersStr = ", ".join([f"{k+1}: {v}" for k, v in playersList])
+            choosePlayer="Please choose select the number of the following players to see the board state of:\n"\
+            f"{playersStr}"
+            pNum = promptUser(int,choosePlayer,0,5,inList = [k+1 for k in playersList])
+            self.playerNotActive = True
+            self.displayGameState(self.players[pNum-1])
+        else:
+            self.message= "You can't view other players hands when playing by youself!"
+
+    def getAction(self):
         actionList=['v','q','w']
         turnPrompt="What would you like to do? \n"\
         "(V) View another players hand\n"\
         "(Q) Draw from the deck\n"\
         "(W) Draw from the discard"
-        if isnotActive:
+        if self.playerNotActive:
             turnPrompt+="\n(R) Return to your hand view"
             actionList.append("r")
-
+        if self.message:
+            print(self.message)
+            self.message = None
         userInput = promptUser(str,turnPrompt,0,2,False,actionList).lower()
 
-        if userInput == 'v':
-            otherPlayers = [player.name for player in self.players].remove(self.currentPlayer.name)
-            if otherPlayers:
-                playersList = enumerate(otherPlayers)
-                playersStr = ", ".join([f"{k+1}: {v}" for k, v in playersList])
-                choosePlayer="Please choose select the number of the following players to see the board state of:\n"\
-                f"{playersStr}"
-                pNum = promptUser(int,choosePlayer,0,5,inList = [k+1 for k in playersList])
-                self.displayGameState(self.players[pNum-1], False)
-            else:
-                print("You can't view other players hands when playing by youself!")
-                self.action()
-        if userInput == 'r':
-            self.displayGameState()
-        if userInput == 'q':
-            self.draw(drawFromDeck=True)
-        if userInput == 'w':
-            self.draw(drawFromDeck=False)
+        return userInput
     
 
     def playTurn(self):
-        self.displayGameState()
+        currentTurn = True
+        while currentTurn:
+            self.displayGameState()
+           
+            if self.activeCard:
+                self.placeCard()
+            
+            else:
+                userInput = self.getAction()
+
+                if userInput == 'v':
+                    self.changeView()
+                self.playerNotActive
+                if userInput == 'r':
+                    self.displayGameState()
+                if userInput == 'q':
+                    self.draw(drawFromDeck=True)
+                if userInput == 'w':
+                    self.draw(drawFromDeck=False)
 
         
 
