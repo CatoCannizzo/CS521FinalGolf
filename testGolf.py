@@ -16,7 +16,7 @@ class testGolfRules(unittest.TestCase):
         self.assertEqual(self.a.getValue(), 1)
         self.assertEqual(self.two.getValue(), 2)
 
-    def testVertScpre(self):
+    def testVertScore(self):
         cards = [self.k,self.q,self.a,self.k,self.j,self.two]
         p = Player(cards)
         self.assertEqual(p.calcScore(),23)

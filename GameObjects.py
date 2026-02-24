@@ -50,7 +50,7 @@ class Card:
         '''Returns score value of card not considering vertical pairs'''
         if self.rank == 'K':
             return 0
-        if self.rank == 'Q' or 'J':
+        if self.rank == 'Q' or self.rank == 'J':
             return 10
         if self.rank == 'A':
             return 1
@@ -92,11 +92,11 @@ class Player:
         for col in range(3):
             cardTop = hand[0][col]
             cardBot = hand[1][col]
-        if cardTop.rank == cardBot.rank:
-            pass
-        else:
-            total += cardTop.getValue()
-            total += cardBot.getValue()
+            if cardTop.rank == cardBot.rank:
+                pass
+            else:
+                total += cardTop.getValue()
+                total += cardBot.getValue()
         return total
 
 
