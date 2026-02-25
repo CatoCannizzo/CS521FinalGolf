@@ -7,13 +7,13 @@ def start_game():
     if promptUser(typed=str, userPrompt=rulesPrompt, ynChoice=True):
         #!!! Bring in the ability to access this at any time
         print("The game starts with each player having 6 face down cards in front of them.")
-        print("The cards for each player are in 2 rows of 3 columns, this is there hand.")
+        print("The cards for each player are in 2 rows of 3 columns, this is their hand.")
         print("You take your turn by swapping a card in your hand for a card from the deck or discard pile.")
-        print("Any card you swap into your hand become face up.")
+        print("Any card you swap becomes face up.")
         print("The game ends when one player has all 6 cards in their hand face up.")
         print("The goal of the game is to have the lowest number of points.")
         print("All cards are worth their number, with Jacks & Queens worth 10")
-        print("Kings are worth 0, as well as getting verital pairs.")
+        print("Kings are worth 0, as well as getting vertical pairs.")
     playerPrompt = "How many players will there be today? (max 4)"
     return promptUser(int,playerPrompt,0,5)
 
@@ -24,14 +24,14 @@ def setUpGame(numPlayers):
     players=[]
     for player in range(0,numPlayers):
         namePrompt = f"What is the name of player {player+1}? (Name must be between 1-14 chars)"
-        # name = promptUser(str,namePrompt,1,14)
-        name = "Player " + str(player)
+        name = promptUser(str,namePrompt,1,14)
         hand = []
         for x in range(6):
             hand.append(deck.deal())
         players.append(Player(hand, name))
-        print(players[player])
+        print(f"6 Cards dealt to {name}! \n We still have")
         print(deck)
+        input("Press enter to continue!")
     return {"players": players, "deck":deck}
 
 def load(saveFile:str =None):
@@ -83,10 +83,8 @@ if __name__ == "__main__":
     if promptUser(typed=str, userPrompt=savedPrompt, ynChoice=True).lower() == "y":
         gameState = load()
     else:
-        # gameState = setUpGame(start_game())
-        pass
-    gameState = setUpGame(2)
-
+        gameState = setUpGame(start_game())
+        
     game = Game(**gameState)
     
     while not game.lastRound:

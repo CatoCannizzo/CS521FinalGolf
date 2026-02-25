@@ -176,7 +176,7 @@ class Game:
     def displayGameState(self, player:Player=None, playerNotActive=False):
         # clears terminal according to:
         # https://stackoverflow.com/questions/517970/how-can-i-clear-the-interpreter-console
-        # print("\033[H\033[J", end="")
+        print("\033[H\033[J", end="")
         
         print(self.deck)
         if player:
@@ -251,11 +251,12 @@ class Game:
         if self.lastRound:
             print(f"{self.players[self.ended].name} ended the game!\n"\
             "All other players: This is your last round.")
-        actionList=['v','q','w']
+        actionList=['e','q','w','r']
         turnPrompt="What would you like to do? \n"\
-        "(V) View another players hand\n"\
+        "(E) View another players hand\n"\
         "(Q) Draw from the deck\n"\
-        "(W) Draw from the discard"
+        "(W) Draw from the discard\n"\
+        "(R) Save game state"
         if self.message:
             print(self.message)
             self.message = None
@@ -274,15 +275,16 @@ class Game:
             
             else:
                 userInput = self.getAction()
-                if userInput == 'v':
+                if userInput == 'e':
                     self.changeView()
                     input("\nViewing other player. Press Enter to return to your hand...")
                     continue
-
                 if userInput == 'q':
                     self.draw(drawFromDeck=True)
                 if userInput == 'w':
                     self.draw(drawFromDeck=False)
+                if userInput == 'r':
+                    self.save()
 
         print("self.lastround check")
         if  self.lastRound:
@@ -320,7 +322,7 @@ class Game:
                 tiePlayers = [j for j in scores if j['score'] == tieScore]
                 for player in tiePlayers:
                     print(f"{i+1}) TIE! {player['player']} got {tieScore} points!")
-            else: print(f"{i+1} {scores[i]['player']} got {scores[i]['score']} points!")
+            else: print(f"Rank: {i+1} {scores[i]['player']} got {scores[i]['score']} points!")
     
     def save(self, saveFile:str =None):
         data = {
