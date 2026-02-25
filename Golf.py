@@ -14,15 +14,16 @@ It runs a card game of Golf with prompts for the user on how they want the game 
 # Add Jokers
 
 # For functions that do need need any other imports
-from GeneralFunctions import promptUser
+from GeneralFunctions import prompt_user
 # A collection of all game objects
 from GameObjects import *
+import json
 
-def setUpGame(numPlayers):
+def set_up_game(num_players=None):
     '''Sets up the game, from sratch, prompting user for rules, and player count '''
     print("Welcome to the card game Golf!")
-    rulesPrompt = "Would you like a rules overview for this game? (y/n)"
-    if promptUser(typed=str, userPrompt=rulesPrompt, ynChoice=True):
+    rules_prompt = "Would you like a rules overview for this game? (y/n)"
+    if prompt_user(typed=str, user_prompt=rules_prompt, ynChoice=True):
         #!!! Bring in the ability to access this at any time
         print("The game starts with each player having 6 face down cards in front of them.")
         print("The cards for each player are in 2 rows of 3 columns, this is their hand.")
@@ -32,99 +33,100 @@ def setUpGame(numPlayers):
         print("The game ends when one player has all 6 cards in their hand face up.")
         print("The goal of the game is to have the lowest number of points.")
         print("All cards are worth their number, with Jacks & Queens worth 10")
-        print("Kings are worth 0, as well as getting vertical pairs.")
-    playerPrompt = "How many players will there be today? (max 4)"
-    numPlayers = promptUser(int,playerPrompt,0,5)
+        print("Kings are worth 0, as well as getting vertical pairs.\n\n")
+    if not num_players:
+        player_prompt = "How many players will there be today? (max 4)"
+        num_players = prompt_user(int,player_prompt,0,5)
     deck=Deck()
     print("Deck shuffled!")
     print(deck)
     players=[]
-    for player in range(0,numPlayers):
+    for player in range(0,num_players):
         # +1 for zero indexing
-        namePrompt = f"What is the name of player {player+1}? "\
+        name_prompt = f"What is the name of player {player+1}? "\
             "(Name must be between 1-14 chars)"
-        name = promptUser(str,namePrompt,1,14)
+        name = prompt_user(str,name_prompt,1,14)
         hand = []
         for x in range(6):
             hand.append(deck.deal())
         players.append(Player(hand, name))
         # Input and prints just for more player feedback, 
         # otherwise screen transitions left me disorientated 
-        print(f"6 Cards dealt to {name}! \n We still have")
+        print(f"6 Cards dealt to {name}!n")
         print(deck)
         input("Press enter to continue!")
     return {"players": players, "deck":deck}
 
-def load(saveFile:str =None):
+def load(save_file:str =None):
     '''Loads game, automatically if called with a file name as string'''
     loading=True
     while(loading):
         # For unittests, or coded files
-        if saveFile:
-            filename = saveFile
+        if save_file:
+            file_name = save_file
         else:
-            filename = "What file would you like to load?"
-            filename = promptUser(str, filename,0)
+            file_name = "What file would you like to load?"
+            file_name = prompt_user(str, file_name,0)
         try:
-            f = open(filename, 'r')
+            f = open(file_name, 'r')
             data = json.load(f)
 
         except FileNotFoundError as e:
             # If file errors give player option to just start new game
             print(f'Error: the file was not found! {e}')
-            if promptUser(userPrompt="Would you like to start a "\
-                              "new game instead?",\
+            if prompt_user(user_prompt="Would you like to start a "\
+                              "new game instead? (y/n)",\
                               ynChoice=True):
                 loading = False
-                return setUpGame()
+                return set_up_game()
         else:
             # Start of game state unpacking
             players= []
             for p in data['players']:
                 cards = []
                 for c in p['grid']:
-                    cards.append(Card(c['suit'],c['rank'],c['faceUp']))
+                    cards.append(Card(c['suit'],c['rank'],c['face_up']))
                 players.append(Player(cards,p['name']))
 
-            tempdiscard = []
+            temp_discard = []
             for c in data['discard']:
-                tempdiscard.append(Card(c['suit'],c['rank'],c['faceUp']))
-            discard = Deck(tempdiscard)
-            tempdeck = []
+                temp_discard.append(Card(c['suit'],c['rank'],c['face_up']))
+            discard = Deck(temp_discard)
+            temp_deck = []
             for c in data['deck']:
-                tempdeck.append(Card(c['suit'],c['rank'],c['faceUp']))
-            deck = Deck(tempdeck)
+                temp_deck.append(Card(c['suit'],c['rank'],c['face_up']))
+            deck = Deck(temp_deck)
             f.close()
             # Returns for **args unpacking
             return {
                 "players": players,
                 "deck": deck,
                 "discard": discard,
-                "lastRound": data["lastRound"],
-                "currentPlayer": data["currentPlayer"],
-                "rowLength": data["rowLength"],
+                "last_round": data["last_round"],
+                "current_player": data["current_player"],
+                "row_length": data["row_length"],
                 "message": data["message"],
                 "ended": data["ended"],
-                "savePath": filename
+                "save_path": file_name
             }
 
 if __name__ == "__main__":
     '''Plays a game of golf, with out four corners rule.'''
-    savedPrompt = "Would you like resume a previously saved game? (y/n)"
-    if promptUser(typed=str, 
-                  userPrompt=savedPrompt, 
+    saved_prompt = "Would you like resume a previously saved game? (y/n)"
+    if prompt_user(typed=str, 
+                  user_prompt=saved_prompt, 
                   ynChoice=True
                   ):
-        gameState = load()
+        game_state = load()
     else:
-        gameState = setUpGame()
+        game_state = set_up_game()
         
-    game = Game(**gameState)
+    game = Game(**game_state)
     
-    while not game.lastRound:
-        game.playTurn()
+    while not game.last_round:
+        game.play_turn()
     # Once last round triggered wait for the turn of the player who ended the game
-    while game.currentPlayer != game.ended:
-        game.playTurn()
+    while game.current_player != game.ended:
+        game.play_turn()
 
     game.score()
