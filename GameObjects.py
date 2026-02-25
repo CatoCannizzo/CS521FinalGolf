@@ -7,7 +7,10 @@ class Deck:
         suits = ['♠', '♣', '♡', '♢']
         ranks = ['2','3','4','5','6','7','8','9','10','K','Q','J','A']
         if order:
-            self.deck = [order]
+            if isinstance(order, list):
+                self.deck = order
+            else:
+                self.deck = [order]
         else:
             self.deck = []
             for suit in suits:
@@ -56,7 +59,7 @@ class Card:
         if self.rank == 'A':
             return 1
         else: return int(self.rank) 
-    def repr(self):
+    def __repr__(self):
         return{"suit": self.suit, "rank":self.rank, "faceUp":self.faceUp}
 
 class Player:
@@ -103,15 +106,19 @@ class Player:
         return total
     
     def __repr__(self):
+        cards = self.getHand()
+        cardsJSON = []
+        for c in cards:
+            cardsJSON.append(c.__repr__())
         return {
             "name": self.name,
-            "grid": self.grid
+            "grid": cardsJSON
         }
     
 
 
 class Game:
-    def __init__(self, players:list[Player], deck:Deck, discard: list[Card]=None,lastround=False,currentPlayer=0,rowLength=(11*3+4*3),message=None,ended=None):
+    def __init__(self, players:list[Player], deck:Deck, discard: Deck=None,lastRound=False,currentPlayer=0,rowLength=(11*3+4*3),message=None,ended=None):
         self.players = players
         self.deck = deck
         self.discard = discard if discard else Deck(self.deck.deal(True))
@@ -119,7 +126,7 @@ class Game:
         self.currentPlayer = currentPlayer
         self.rowLength = rowLength
         self.activeCard = None
-        self.message = self.message
+        self.message = message
         self.ended = ended
 
     def getCardbyLine(self, card:Card):
@@ -315,18 +322,34 @@ class Game:
                     print(f"{i+1}) TIE! {player['player']} got {tieScore} points!")
             else: print(f"{i+1} {scores[i]['player']} got {scores[i]['score']} points!")
     
-    def save(self):
+    def save(self, saveFile:str =None):
         data = {
             "currentPlayer":self.currentPlayer,
             "lastRound": self.lastRound,
             "ended":self.ended,
             "message":self.message,
             "rowLength":self.rowLength,
-            "players": [p.__repr__ for p in self.players],
-            "discard": [c.__repr__ for c in self.discard],
-            "deck": [c.__repr__ for c in self.deck]
+            "players": [p.__repr__() for p in self.players],
+            "discard": [c.__repr__() for c in self.discard],
+            "deck": [c.__repr__() for c in self.deck]
         }
-        gameName = "Please input a name for this game."
-        gameName=promptUser(str,gameName,0,14)
-        with open(gameName,'w') as f:
-            json.dump(data, f, indent=4)
+        
+        while True:
+            if saveFile:
+               gameName = saveFile
+            else:
+                gameName = promptUser(str, "Input save name:", 1, 14, notList=["*","/","\\", "?"])
+            try:
+                with open(gameName, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, indent=4)
+                self.message=f'Successfully saved to {gameName}! Press Cntl + C to leave program'
+                f.close()
+                break 
+                
+            except PermissionError as e:
+                print(f"Error: Permission denied. {e}")
+                break 
+            except OSError as e:
+                print(f"Error: Invalid filename. {e}")
+
+        

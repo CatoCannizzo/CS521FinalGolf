@@ -34,11 +34,14 @@ def setUpGame(numPlayers):
         print(deck)
     return {"players": players, "deck":deck}
 
-def load():
+def load(saveFile:str =None):
     loading=True
     while(loading):
-        filename = "What file would you like to load?"
-        filename = promptUser(str, filename,0)
+        if saveFile:
+            filename = saveFile
+        else:
+            filename = "What file would you like to load?"
+            filename = promptUser(str, filename,0)
         try:
             f = open(filename, 'r')
             data = json.load(f)
@@ -51,23 +54,29 @@ def load():
         players= []
         for p in data['players']:
             cards = []
-            for row in p['grid']:
-                for c in row:
-                    cards.append(Card(c['suit'],c['rank'],c['faceUp']))
-            players.append(cards,p['name'])
-        discard = []
+            for c in p['grid']:
+                cards.append(Card(c['suit'],c['rank'],c['faceUp']))
+            players.append(Player(cards,p['name']))
+
+        tempdiscard = []
         for c in data['discard']:
-            discard.append(Card(c['suit'],c['rank'],c['faceUp']))
-        deck = []
+            tempdiscard.append(Card(c['suit'],c['rank'],c['faceUp']))
+        discard = Deck(tempdiscard)
+        tempdeck = []
         for c in data['deck']:
-            deck.append(Card(c['suit'],c['rank'],c['faceUp']))
-        currentPlayer = data['currentPlayer']
-        lastRound = data["lastRound"]
-        ended = data["ended"]
-        message = data["message"]
-        rowLength = data["rowLength"]
-        args = [players,deck,discard,lastRound,currentPlayer,rowLength,message,ended]
-        return args
+            tempdeck.append(Card(c['suit'],c['rank'],c['faceUp']))
+        deck = Deck(tempdeck)
+        f.close()
+        return {
+            "players": players,
+            "deck": deck,
+            "discard": discard,
+            "lastRound": data["lastRound"],
+            "currentPlayer": data["currentPlayer"],
+            "rowLength": data["rowLength"],
+            "message": data["message"],
+            "ended": data["ended"]
+        }
 
 if __name__ == "__main__":
     savedPrompt = "Would you like resume a previously saved game? (y/n)"
