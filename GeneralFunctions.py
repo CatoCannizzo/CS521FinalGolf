@@ -1,4 +1,4 @@
-def promptUser(typed:type = None, userPrompt: str = None, aboveX:int = None,underY:int = None, ynChoice: bool =False, inList=[]):
+def promptUser(typed:type = None, userPrompt: str = None, aboveX:int = None,underY:int = None, ynChoice: bool =False, inList=[], notList=[]):
     """Returns value from prompted user, optional arg to enforce type return of prompt, and to give specific prompt"""
 
     while True:
@@ -40,6 +40,10 @@ def promptUser(typed:type = None, userPrompt: str = None, aboveX:int = None,unde
         if inList:
             if userInput.lower() not in inList:
                     print(f'ValueError: value inputted must one of {inList}.')
+                    continue  
+        if notList:
+            if userInput.lower() in notList:
+                    print(f'ValueError: value inputted can not contain one of {notList}.')
                     continue   
         return userInput
 
