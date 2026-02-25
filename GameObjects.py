@@ -20,8 +20,9 @@ class Deck:
     def __init__(self, order=None):
         '''Creates a deck, if order if provided uses that,
         otherwise creates a shuffled deck'''
-        suits = ['♠', '♣', '♡', '♢']
-        ranks = ['2','3','4','5','6','7','8','9','10','K','Q','J','A']
+        # Definition of a deck as private sets
+        __suits = {'♠', '♣', '♡', '♢'}
+        __ranks = {'2','3','4','5','6','7','8','9','10','K','Q','J','A'}
         if order:
             if isinstance(order, list):
                 self.deck = order
@@ -29,8 +30,8 @@ class Deck:
                 self.deck = [order]
         else:
             self.deck = []
-            for suit in suits:
-                for rank in ranks:
+            for suit in __suits:
+                for rank in __ranks:
                     self.deck.append(Card(suit,rank, False))
             random.shuffle(self.deck)
         
@@ -68,6 +69,11 @@ class Deck:
 class Card:
     '''Represents a playing card with suite, rank, and ability to be flipped'''
 
+    # Private attribute to prvent other code from changing values
+    __RankValues = {
+        'K':0, 'Q':10, 'J':10, 'A':1
+    }
+
     def __init__(self, suit, rank, faceUp = False):
         '''Inits a card with suite, rank, and optional status of flipped'''
         self.suit = suit
@@ -91,12 +97,9 @@ class Card:
         in golf rules.
         Kings = 0, Queen and J = 10, Aces = 1
         '''
-        if self.rank == 'K':
-            return 0
-        if self.rank == 'Q' or self.rank == 'J':
-            return 10
-        if self.rank == 'A':
-            return 1
+        if self.rank in self.__RankValues:
+            return self.__RankValues[self.rank]
+        
         else: return int(self.rank) 
 
     def __repr__(self):
@@ -106,14 +109,21 @@ class Card:
 class Player:
     '''Represents all variables of a player in the game. 
     Their hand is a 2x3 grid of cards'''
+    # Tuple constant for grid shape for programtic changes to hand size
+    gridShape = (2,3)
 
-    def __init__(self, cards: list, name="player"):
+    def __init__(self, cards: list, name:str="player"):
         '''Inits a player with names, 
         takes 6 cards and turns it into a 2x3 hand'''
         self.name = name
-        if len(cards) != 6:
-            raise ValueError(f"Invalid hand size, expected 6 cards but recieved {len(cards)}")
-        self.grid = [cards[0:3],cards[3:6]]
+        handSize = Player.gridShape[0]*Player.gridShape[1]
+        if len(cards) != (handSize):
+            raise ValueError(f"Invalid hand size, expected {handSize} cards but recieved {len(cards)}")
+        self.grid = []
+        for rowIndex in range(self.gridShape[0]):
+            rowStart = rowIndex * Player.gridShape[1]
+            rowEnd = rowStart + Player.gridShape[1]
+            self.grid.append(cards[rowStart:rowEnd])
 
     def checkFinished(self):
         '''If hand is all face up, returns True (and if so game should end)'''
@@ -146,7 +156,7 @@ class Player:
         So vertical pairs become 0 points'''
         total = 0
         hand = self.grid
-        for col in range(3):
+        for col in range(Player.gridShape[1]):
             cardTop = hand[0][col]
             cardBot = hand[1][col]
             if cardTop.rank == cardBot.rank:
@@ -175,8 +185,19 @@ class Player:
 class Game:
     '''Has methods for all controls of game state
       and saves all game states!'''
-    def __init__(self, players:list[Player], deck:Deck, discard: Deck=None,lastRound=False,currentPlayer=0,rowLength=(11*3+4*3),message=None,ended=None):
+    def __init__(self, 
+                 players:list[Player], 
+                 deck:Deck, 
+                 discard: Deck=None,
+                 lastRound=False,
+                 currentPlayer=0,
+                 rowLength=((11+4)*Player.gridShape[1]),
+                 message=None,
+                 ended=None,
+                 savePath=None):
         '''Inits the game state with players, deck mandatory'''
+        # rowLength = card length (11) + space between cards (4) * cards in row
+
         self.players = players
         self.deck = deck
         self.discard = discard if discard else Deck(self.deck.deal(True))
@@ -186,9 +207,10 @@ class Game:
         self.activeCard = None
         self.message = message
         self.ended = ended
+        self.__savePath = savePath
 
-    def getCardbyLine(self, card:Card):
-        '''Returns a list of strings for cards in ASCII'''
+    def __getCardbyLine(self, card:Card):
+        '''A private helper function to return a list of strings for cards in ASCII'''
         width = 9
         # Filler must be one chacter to work with center below
         filler = "·"
@@ -211,15 +233,16 @@ class Game:
         stringDisplay =  [topLine,topRank,spacer,midLine,spacer,botRank,botLine]
         return stringDisplay
 
-    def displayByLine(self, cards:list, playerHand:int = 0):
-        '''Prints multiple cards side by side (for displaying a hand)'''
+    def __displayByLine(self, cards:list, playerHand:int = 0):
+        '''A private helper function that prints multiple cards side by side 
+        (for displaying a hand)'''
         # Cards are currently 7 lines tall
         cardsDisplay = [""for i in range(7)]
 
         # Need to print card number next to a players hand for UI intuitiveness
         if playerHand:
             for i in range(0,len(cards)):
-                cardByLine = self.getCardbyLine(cards[i])
+                cardByLine = self.__getCardbyLine(cards[i])
                 for j in range(0,len(cardsDisplay)):
                     if playerHand == 1 and j == 0:
                         cardsDisplay[j] +=f"{i+1})"+cardByLine[j] + "   "
@@ -227,10 +250,11 @@ class Game:
                         cardsDisplay[j] +=f"{i+4})"+cardByLine[j] + "   "
                     else:
                         cardsDisplay[j] +="  " +cardByLine[j] + "   "
+
         # Otherwise prints list of cards given
         else:  
             for card in cards:
-                cardByLine = self.getCardbyLine(card)
+                cardByLine = self.__getCardbyLine(card)
                 for i in range(0,len(cardsDisplay)):
                     cardsDisplay[i] +=cardByLine[i] + "   "
 
@@ -256,11 +280,11 @@ class Game:
         # If in the middle of an action stop displaying decks
         if self.activeCard:
             print('You drew:'.center(self.rowLength,'-'))
-            self.displayByLine([self.activeCard])
+            self.__displayByLine([self.activeCard])
         else:
             deckNames = "Deck:"+"-"*7+"Discard:"
             print(deckNames.center(self.rowLength,'-'))
-            self.displayByLine([self.deck[-1], self.discard[-1]])
+            self.__displayByLine([self.deck[-1], self.discard[-1]])
         
         # Prints warning if not looking at own hand
         if playerNotActive:
@@ -268,15 +292,15 @@ class Game:
         else:
             print(f"{p.name}'s hand".center(self.rowLength,'-'))
         for index, row in enumerate(p.grid):
-            self.displayByLine(row, index+1)
+            self.__displayByLine(row, index+1)
    
     def swapCard(self, target:int=None):
         '''Swaps the active card 
         with a card in the player's grid or discard
         Optional arg allows targeting of things other than discard pile'''
         if target:
-            row = (target-1)//3
-            col = (target-1)%3
+            row = (target-1)//Player.gridShape[1]
+            col = (target-1)%Player.gridShape[1]
             player = self.players[self.currentPlayer]
             playerCards = player.grid
             targetCard = playerCards[row][col]
@@ -372,7 +396,7 @@ class Game:
                 if userInput == 'w':
                     self.draw(drawFromDeck=False)
                 if userInput == 'r':
-                    self.save()
+                    self.save(self.__savePath)
         # If game ended after player action flip all cards
         if  self.lastRound:
             hand = self.players[self.currentPlayer].getHand()
@@ -439,14 +463,12 @@ class Game:
             try:
                 with open(gameName, 'w', encoding='utf-8') as f:
                     json.dump(data, f, indent=4)
-                self.message=f'Successfully saved to {gameName}! Press Cntl + C to leave program'
-                f.close()
-                break 
                 
             except PermissionError as e:
                 print(f"Error: Permission denied. {e}")
                 break 
             except OSError as e:
                 print(f"Error: Invalid filename. {e}")
-
-        
+            else:
+                self.message=f'Successfully saved to {gameName}! Press Cntl + C to leave program'
+                break

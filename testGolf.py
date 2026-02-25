@@ -15,7 +15,7 @@ import os
 from Golf import load
 from GameObjects import *
 
-class testGolfRules(unittest.TestCase):
+class TestGolfRules(unittest.TestCase):
     '''Suite of unit tests for core rules 
     and data persistence of Golf card Game'''
     def setUp(self):
@@ -69,6 +69,12 @@ class testGolfRules(unittest.TestCase):
         self.assertEqual(len(loadedGame.discard), len(self.game.discard))
         self.assertEqual(len(loadedGame.deck), len(self.game.deck))
         self.assertEqual(loadedGame.currentPlayer, self.game.currentPlayer)
+    
+    def tearDown(self):
+        try:
+            os.remove(self.testSave)
+        except OSError:
+            pass
 
 
 if __name__ == '__main__':

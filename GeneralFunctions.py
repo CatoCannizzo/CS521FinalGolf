@@ -64,4 +64,3 @@ def promptUser(typed:type = None,
                     print(f'ValueError: value inputted can not contain one of {notList}.')
                     continue   
         return userInput
-

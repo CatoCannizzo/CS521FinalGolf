@@ -6,13 +6,17 @@ This file contains the game flow and non class based methods
 
 It runs a card game of Golf with prompts for the user on how they want the game set up.
 """
-from GeneralFunctions import promptUser
-from GameObjects import *
-# To do add computer opponent
+# To Do:
+# add computer opponent
 # Add round system
 # Make load a game method so a game can be init'd then loaded
     # So the object is self sufficient
 # Add Jokers
+
+# For functions that do need need any other imports
+from GeneralFunctions import promptUser
+# A collection of all game objects
+from GameObjects import *
 
 def setUpGame(numPlayers):
     '''Sets up the game, from sratch, prompting user for rules, and player count '''
@@ -55,6 +59,7 @@ def load(saveFile:str =None):
     '''Loads game, automatically if called with a file name as string'''
     loading=True
     while(loading):
+        # For unittests, or coded files
         if saveFile:
             filename = saveFile
         else:
@@ -72,34 +77,36 @@ def load(saveFile:str =None):
                               ynChoice=True):
                 loading = False
                 return setUpGame()
-        # Start of game state unpacking
-        players= []
-        for p in data['players']:
-            cards = []
-            for c in p['grid']:
-                cards.append(Card(c['suit'],c['rank'],c['faceUp']))
-            players.append(Player(cards,p['name']))
+        else:
+            # Start of game state unpacking
+            players= []
+            for p in data['players']:
+                cards = []
+                for c in p['grid']:
+                    cards.append(Card(c['suit'],c['rank'],c['faceUp']))
+                players.append(Player(cards,p['name']))
 
-        tempdiscard = []
-        for c in data['discard']:
-            tempdiscard.append(Card(c['suit'],c['rank'],c['faceUp']))
-        discard = Deck(tempdiscard)
-        tempdeck = []
-        for c in data['deck']:
-            tempdeck.append(Card(c['suit'],c['rank'],c['faceUp']))
-        deck = Deck(tempdeck)
-        f.close()
-        # Returns for **args unpacking
-        return {
-            "players": players,
-            "deck": deck,
-            "discard": discard,
-            "lastRound": data["lastRound"],
-            "currentPlayer": data["currentPlayer"],
-            "rowLength": data["rowLength"],
-            "message": data["message"],
-            "ended": data["ended"]
-        }
+            tempdiscard = []
+            for c in data['discard']:
+                tempdiscard.append(Card(c['suit'],c['rank'],c['faceUp']))
+            discard = Deck(tempdiscard)
+            tempdeck = []
+            for c in data['deck']:
+                tempdeck.append(Card(c['suit'],c['rank'],c['faceUp']))
+            deck = Deck(tempdeck)
+            f.close()
+            # Returns for **args unpacking
+            return {
+                "players": players,
+                "deck": deck,
+                "discard": discard,
+                "lastRound": data["lastRound"],
+                "currentPlayer": data["currentPlayer"],
+                "rowLength": data["rowLength"],
+                "message": data["message"],
+                "ended": data["ended"],
+                "savePath": filename
+            }
 
 if __name__ == "__main__":
     '''Plays a game of golf, with out four corners rule.'''
