@@ -16,17 +16,17 @@
                 {
                     "suit": "\u2660",
                     "rank": "Q",
-                    "faceUp": true
+                    "faceUp": false
                 },
                 {
                     "suit": "\u2660",
                     "rank": "A",
-                    "faceUp": true
+                    "faceUp": false
                 },
                 {
                     "suit": "\u2660",
                     "rank": "K",
-                    "faceUp": true
+                    "faceUp": false
                 },
                 {
                     "suit": "\u2660",
@@ -43,15 +43,115 @@
     ],
     "discard": [
         {
-            "suit": "\u2662",
-            "rank": "2",
+            "suit": "\u2663",
+            "rank": "6",
             "faceUp": true
         }
     ],
     "deck": [
         {
+            "suit": "\u2663",
+            "rank": "8",
+            "faceUp": false
+        },
+        {
             "suit": "\u2662",
-            "rank": "6",
+            "rank": "3",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "4",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2662",
+            "rank": "K",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2661",
+            "rank": "10",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2663",
+            "rank": "Q",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2662",
+            "rank": "5",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "2",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2662",
+            "rank": "4",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2662",
+            "rank": "7",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2663",
+            "rank": "7",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "A",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "7",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "8",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2661",
+            "rank": "4",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2663",
+            "rank": "5",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2663",
+            "rank": "10",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "9",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2661",
+            "rank": "5",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2662",
+            "rank": "A",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2662",
+            "rank": "J",
             "faceUp": false
         },
         {
@@ -60,48 +160,33 @@
             "faceUp": false
         },
         {
-            "suit": "\u2660",
-            "rank": "6",
-            "faceUp": false
-        },
-        {
             "suit": "\u2663",
             "rank": "J",
             "faceUp": false
         },
         {
-            "suit": "\u2660",
-            "rank": "5",
+            "suit": "\u2663",
+            "rank": "K",
             "faceUp": false
         },
         {
             "suit": "\u2662",
-            "rank": "5",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2660",
-            "rank": "7",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
-            "rank": "6",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
-            "rank": "4",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
             "rank": "2",
             "faceUp": false
         },
         {
+            "suit": "\u2662",
+            "rank": "10",
+            "faceUp": false
+        },
+        {
             "suit": "\u2660",
-            "rank": "4",
+            "rank": "3",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "K",
             "faceUp": false
         },
         {
@@ -111,26 +196,11 @@
         },
         {
             "suit": "\u2662",
-            "rank": "7",
+            "rank": "9",
             "faceUp": false
         },
         {
             "suit": "\u2662",
-            "rank": "8",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
-            "rank": "8",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
-            "rank": "3",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
             "rank": "Q",
             "faceUp": false
         },
@@ -140,123 +210,18 @@
             "faceUp": false
         },
         {
-            "suit": "\u2660",
-            "rank": "2",
+            "suit": "\u2661",
+            "rank": "Q",
             "faceUp": false
         },
         {
-            "suit": "\u2660",
+            "suit": "\u2661",
+            "rank": "9",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2662",
             "rank": "8",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2662",
-            "rank": "Q",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2662",
-            "rank": "4",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2662",
-            "rank": "9",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
-            "rank": "5",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2662",
-            "rank": "3",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2662",
-            "rank": "A",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
-            "rank": "9",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
-            "rank": "K",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
-            "rank": "A",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2660",
-            "rank": "J",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2662",
-            "rank": "J",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
-            "rank": "5",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2660",
-            "rank": "9",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
-            "rank": "9",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2660",
-            "rank": "Q",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
-            "rank": "2",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
-            "rank": "7",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
-            "rank": "10",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2660",
-            "rank": "3",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2660",
-            "rank": "A",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
-            "rank": "3",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2662",
-            "rank": "10",
             "faceUp": false
         },
         {
@@ -265,42 +230,77 @@
             "faceUp": false
         },
         {
-            "suit": "\u2661",
-            "rank": "7",
-            "faceUp": false
-        },
-        {
             "suit": "\u2663",
-            "rank": "K",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2661",
             "rank": "4",
             "faceUp": false
         },
         {
-            "suit": "\u2660",
-            "rank": "K",
-            "faceUp": false
-        },
-        {
-            "suit": "\u2663",
+            "suit": "\u2661",
             "rank": "8",
             "faceUp": false
         },
         {
             "suit": "\u2663",
-            "rank": "10",
+            "rank": "3",
             "faceUp": false
         },
         {
             "suit": "\u2662",
+            "rank": "6",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "J",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2661",
+            "rank": "7",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2661",
             "rank": "K",
             "faceUp": false
         },
         {
             "suit": "\u2663",
+            "rank": "2",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2663",
+            "rank": "9",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "5",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2661",
+            "rank": "2",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2663",
+            "rank": "A",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
+            "rank": "6",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2661",
+            "rank": "3",
+            "faceUp": false
+        },
+        {
+            "suit": "\u2660",
             "rank": "Q",
             "faceUp": false
         }

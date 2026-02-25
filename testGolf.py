@@ -7,11 +7,12 @@ from GameObjects import *
 class testGolfRules(unittest.TestCase):
     def setUp(self):
         self.k = Card('♠', 'K', True)
-        self.q = Card('♠','Q',True)
+        self.kFlipped = Card('♠', 'K', False)
+        self.q = Card('♠','Q',False)
         self.j = Card('♠','J',True)
-        self.a = Card('♠', 'A', True)
+        self.a = Card('♠', 'A', False)
         self.two = Card('♠', '2', True)
-        self.cards = [self.k,self.q,self.a,self.k,self.j,self.two]
+        self.cards = [self.k,self.q,self.a,self.kFlipped,self.j,self.two]
         self.player = Player(self.cards, "TestPlayer")
         self.deck = Deck()
         self.game = Game([self.player],self.deck)
