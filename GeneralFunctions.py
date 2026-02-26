@@ -26,8 +26,8 @@ def prompt_user(typed:type = None,
             try:
                 user_input = typed(user_input)
             except ValueError:
-                print(f'ValueError: "\
-                      "value inputted must be of {typed.__name__} type')
+                print("ValueError: value inputted"\
+                      f" must be of {typed.__name__} type")
                 continue 
             except Exception as e:
                 print(f'Unknown Error: {type(e).__name__} - {e}')
