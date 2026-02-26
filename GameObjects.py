@@ -185,8 +185,6 @@ class Player:
             "grid": cards_JSON
         }
     
-
-
 class Game:
     '''Has methods for all controls of game state
       and saves all game states!'''
@@ -352,6 +350,7 @@ class Game:
             f"{players_str}"
             p_num = prompt_user(int,choose_player,0,5,in_list = [k+1 for k in players_list])
             self.display_game_state(others[p_num-1], True)
+            input("\nViewing other player. Press Enter to return to your hand...")
         # Prevents call if playing by self
         else:
             self.message= "You can't view other players hands when playing by youself!"
@@ -394,7 +393,6 @@ class Game:
                 user_input = self.get_action()
                 if user_input == 'e':
                     self.change_view()
-                    input("\nViewing other player. Press Enter to return to your hand...")
                     continue
                 if user_input == 'q':
                     self.draw(from_deck=True)
