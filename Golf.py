@@ -5,6 +5,7 @@ By Cato Cannizzo
 This file contains the game flow and non class based methods
 
 It runs a card game of Golf with prompts for the user on how they want the game set up.
+Video link: https://kaf.bu.edu/media/1_m5hgjw8u
 """
 # To Do:
 # add computer opponent

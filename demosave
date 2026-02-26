@@ -29,9 +29,9 @@
                     "face_up": true
                 },
                 {
-                    "suit": "\u2661",
-                    "rank": "7",
-                    "face_up": false
+                    "suit": "\u2662",
+                    "rank": "5",
+                    "face_up": true
                 },
                 {
                     "suit": "\u2663",
@@ -70,6 +70,11 @@
         {
             "suit": "\u2662",
             "rank": "6",
+            "face_up": true
+        },
+        {
+            "suit": "\u2661",
+            "rank": "7",
             "face_up": true
         }
     ],
@@ -267,11 +272,6 @@
         {
             "suit": "\u2660",
             "rank": "9",
-            "face_up": false
-        },
-        {
-            "suit": "\u2662",
-            "rank": "5",
             "face_up": false
         }
     ]
